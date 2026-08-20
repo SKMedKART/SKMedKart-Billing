@@ -43,6 +43,8 @@ public class DB extends SQLiteOpenHelper {
             this.price = price;
             this.qty = qty;
         }
+    public double amount() {
+    return price * qty;
     }
 
     public DB(Context context) {
@@ -606,5 +608,36 @@ public class DB extends SQLiteOpenHelper {
                         String.valueOf(billId)
                 }
         );
+    }
+        // Compatibility method for existing MainActivity.java
+    public ArrayList<BillItem> billItems(long billId) {
+
+        ArrayList<BillItem> list = new ArrayList<>();
+
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT medicine_id,medicine_name,price,qty " +
+                        "FROM bill_items " +
+                        "WHERE bill_id=? " +
+                        "ORDER BY id ASC",
+                new String[]{
+                        String.valueOf(billId)
+                }
+        );
+
+        while (c.moveToNext()) {
+
+            list.add(
+                    new BillItem(
+                            c.getLong(0),
+                            c.getString(1),
+                            c.getDouble(2),
+                            c.getInt(3)
+                    )
+            );
+        }
+
+        c.close();
+
+        return list;
     }
 }
